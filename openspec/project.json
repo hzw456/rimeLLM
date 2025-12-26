@@ -1,0 +1,8 @@
+{
+  "name": "rimeLLM",
+  "version": "1.0.0",
+  "description": "AI 剪切板 - 智能输入增强工具",
+  "specs": [
+    "core"
+  ]
+}

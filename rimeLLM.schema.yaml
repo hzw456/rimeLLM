@@ -33,8 +33,8 @@ speller:
   alphabet: "abcdefghijklmnopqrstuvwxyz"
   delimiter: " "
 
-translator:
-  dictionary: luna_pinyin
+dictionaries:
+  - luna_pinyin
 
 punctuator:
   import_preset: default

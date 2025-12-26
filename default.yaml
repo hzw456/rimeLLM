@@ -1,0 +1,32 @@
+# Rime default configuration
+# 添加或删除 schema 到 schema_list 中来启用或禁用输入方案
+
+schema_list:
+  - schema: luna_pinyin
+  - schema: rimeLLM
+
+# 候选词排列方式
+#   - 按照schema指定的顺序 (forward)
+#   - 按使用频率排序 (freq)
+#   - 按手动调整排序 (custom)
+menu:
+  page_size: 5
+  alternative_select_keys: "1234567890"
+
+# 中英文切换
+switcher:
+  caption: "〔方案选单〕"
+  hotkeys:
+    - "Control+Shift+space"
+    - "Control+Shift+1"
+    - "Control+Shift+2"
+  save_options:
+    - "reset"
+  fold_options: true
+
+# ASCII 模式切换
+recognizer:
+  patterns:
+    uppercase: "[A-Z]"
+    email: "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
+    url: "^(https?|ftp|file)://[-A-Za-z0-9+&@#/%?=~_|!:,.;]*[-A-Za-z0-9+&@#/%=~_|]$"

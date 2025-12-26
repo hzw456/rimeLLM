@@ -78,7 +78,7 @@ function TextProcessor:_should_process(text, feature)
     end
     
     local min_length = 10
-    if #text < min_length then
+    if #text <= min_length then
         return false, "too_short"
     end
     

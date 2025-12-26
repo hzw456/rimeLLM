@@ -77,7 +77,7 @@ function TextProcessor:_should_process(text, feature)
         return false, "feature_disabled"
     end
     
-    local min_length = 2
+    local min_length = 10
     if #text < min_length then
         return false, "too_short"
     end

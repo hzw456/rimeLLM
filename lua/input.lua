@@ -221,7 +221,7 @@ function InputCapturer:should_trigger_ai(ctx)
         return false, "too_long"
     end
     
-    local min_chars = 3
+    local min_chars = 10
     if #ctx.composed_text < min_chars then
         return false, "too_short"
     end

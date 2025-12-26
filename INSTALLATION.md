@@ -140,6 +140,34 @@ rimeLLM:
 
 3. Restart Rime completely
 
+### Schema not appearing in scheme list
+
+The rimeLLM plugin works as a Lua extension that enhances your existing input scheme (like luna_pinyin). It does not appear as a separate schema in the Ctrl+Shift+number switch list by default.
+
+To make rimeLLM appear as a selectable input scheme:
+
+1. Copy the schema file to your Rime directory:
+```bash
+cp rimeLLM/rimeLLM.schema.yaml ~/Library/Rime/
+```
+
+2. Edit or create `default.yaml` in your Rime directory and add the schema reference:
+```bash
+# Check if default.yaml exists
+ls ~/Library/Rime/default.yaml
+
+# If it doesn't exist, create it with basic schema list:
+# schema_list:
+#   - schema: luna_pinyin
+#   - schema: rimeLLM
+```
+
+3. Deploy Rime:
+   - Right-click the Rime status icon
+   - Select "Deploy" or "重新部署"
+
+4. Use `Ctrl+Shift+数字` to switch to rimeLLM scheme
+
 ### Connection errors
 
 1. Verify API endpoint is accessible:

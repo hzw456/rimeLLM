@@ -1,64 +1,47 @@
 # Rime schema - rimeLLM
-# This file defines the rimeLLM input schema that can be used standalone
-# or as a patch for existing schemas
+# Basic schema for AI-enhanced input
 
 schema:
   schema_id: rimeLLM
-  name: rimeLLM (AI Enhanced)
+  name: rimeLLM
   version: "1.0.0"
-  description: AI-enhanced input with correction, translation and expansion
-
-switches:
-  - name: ascii_mode
-    reset: 0
-    states: [ 中文, 西文 ]
-  - name: full_shape
-    states: [ 半角, 全角 ]
-  - name: simplification
-    states: [ 简体, 繁體 ]
-  - name: rime_llm_enabled
-    reset: 1
-    states: [ AI OFF, AI ON ]
+  description: AI Enhanced Input Schema
 
 engine:
   processors:
     - key_processor
-    - focus_processor
-    - engine_processor
-    - rime_llm_processor  # Custom processor for AI features
+    - sp_processor
+    - engage_processor
+    - executor_processor
   segmentors:
     - ascii_segmentor
-    - matcher_segmentor
-    - affix_segmentor
-    - rime_llm_segmentor  # Custom segmentor for suggestions
+    - abc_segmentor
+    - punct_segmentor
+    - r11n_segmentor
+    - fallback_segmentor
   translators:
     - punct_translator
-    - rime_llm_translator  # Custom translator for AI suggestions
+    - echo_translator
+    - script_translator
   filters:
     - uniquifier
 
 menu:
-  page_size: 9
+  page_size: 6
+
+speller:
+  alphabet: "abcdefghijklmnopqrstuvwxyz"
+  delimiter: " "
+
+translator:
+  dictionary: luna_pinyin
 
 punctuator:
-  full_shape:
-    " " : { commit: "　" }
-    "," : { commit: "，" }
-    "." : { commit: "。" }
-    "<" : { commit: "《" }
-    ">" : { commit: "》" }
-    "[" : { commit: "【" }
-    "]" : { commit: "】" }
-    "{" : { commit: "｛" }
-    "}" : { commit: "｝" }
-  half_shape:
-    " " : { commit: " " }
-    "," : { commit: "," }
-    "." : { commit: "." }
+  import_preset: default
 
 key_binder:
   select_keys:
     - "123456789"
   bindings:
-    - { when: has_menu, accept: Tab, action: select_first }
-    - { when: composing, accept: Escape, action: rime_llm_reject }
+    - { when: has_menu, accept: "Tab", action: select_first }
+    - { when: composing, accept: "Escape", action: clear }

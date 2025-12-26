@@ -218,4 +218,41 @@ function SuggestionDisplay:refresh()
     end
 end
 
+function SuggestionDisplay:show_clipboard_candidates(raw_text, optimized_text)
+    if not raw_text or raw_text == "" then
+        utils.debug("No clipboard content to display")
+        return
+    end
+    
+    self.current_suggestions = {}
+    
+    table.insert(self.current_suggestions, {
+        id = 1,
+        text = raw_text,
+        type = "clipboard_raw"
+    })
+    
+    if optimized_text and optimized_text ~= "" and optimized_text ~= raw_text then
+        table.insert(self.current_suggestions, {
+            id = 2,
+            text = optimized_text,
+            type = "clipboard_optimized"
+        })
+    end
+    
+    self.suggestion_id = self.suggestion_id + 1
+    
+    self:_show_candidates()
+    utils.info("Clipboard candidates shown: " .. tostring(#self.current_suggestions))
+end
+
+function SuggestionDisplay:get_suggestion_by_id(id)
+    for _, s in ipairs(self.current_suggestions) do
+        if s.id == id then
+            return s
+        end
+    end
+    return nil
+end
+
 return SuggestionDisplay

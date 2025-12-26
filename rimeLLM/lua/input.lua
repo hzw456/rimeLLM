@@ -19,12 +19,15 @@ function InputCapturer.new(config_manager)
     self.is_composing = false
     self.last_commit_time = 0
     self.current_schema = ""
+    self.clipboard_trigger_pattern = "cb"
+    self.clipboard_trigger_active = false
     return self
 end
 
 function InputCapturer:init()
     self.max_buffer_size = self.config:get("performance.max_buffer_size", 5)
-    utils.info("InputCapturer initialized")
+    self.clipboard_trigger_pattern = self.config:get("clipboard.trigger_pattern", "cb")
+    utils.info("InputCapturer initialized with trigger pattern: " .. self.clipboard_trigger_pattern)
 end
 
 function InputCapturer:reset()
@@ -229,6 +232,36 @@ end
 function InputCapturer:clear_buffer()
     self.context_buffer = {}
     utils.info("Context buffer cleared")
+end
+
+function InputCapturer:check_clipboard_trigger(text)
+    if not self.config:get("clipboard.enabled", true) then
+        return false, nil
+    end
+    
+    local pattern = self.clipboard_trigger_pattern
+    if text and text == pattern then
+        self.clipboard_trigger_active = true
+        utils.info("Clipboard trigger activated: " .. pattern)
+        return true, "trigger"
+    end
+    
+    if self.clipboard_trigger_active then
+        if not text or text == "" or text ~= pattern then
+            self.clipboard_trigger_active = false
+            utils.debug("Clipboard trigger cancelled")
+        end
+    end
+    
+    return false, nil
+end
+
+function InputCapturer:is_clipboard_trigger_active()
+    return self.clipboard_trigger_active
+end
+
+function InputCapturer:deactivate_clipboard_trigger()
+    self.clipboard_trigger_active = false
 end
 
 return InputCapturer

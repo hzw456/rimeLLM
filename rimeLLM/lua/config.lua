@@ -41,6 +41,13 @@ function ConfigManager.new()
         logging = {
             level = "INFO",
             enabled = true
+        },
+        clipboard = {
+            enabled = true,
+            trigger_pattern = "cb",
+            optimize_enabled = true,
+            max_length = 1000,
+            cache_ms = 5000
         }
     }
     return self
@@ -200,6 +207,21 @@ function ConfigManager:_merge_with_defaults(config)
             end
             if config.performance.cache_enabled ~= nil then
                 merged.performance.cache_enabled = config.performance.cache_enabled
+            end
+        end
+        
+        if config.clipboard then
+            if config.clipboard.enabled ~= nil then
+                merged.clipboard.enabled = config.clipboard.enabled
+            end
+            if config.clipboard.trigger_pattern then
+                merged.clipboard.trigger_pattern = config.clipboard.trigger_pattern
+            end
+            if config.clipboard.optimize_enabled ~= nil then
+                merged.clipboard.optimize_enabled = config.clipboard.optimize_enabled
+            end
+            if config.clipboard.max_length then
+                merged.clipboard.max_length = config.clipboard.max_length
             end
         end
     end

@@ -58,3 +58,9 @@ rimeLLM:
     timeout_ms: 2000   # AI API timeout
     cache_enabled: true
     max_input_chars: 100
+
+  clipboard:
+    enabled: true      # Enable clipboard trigger feature
+    trigger_pattern: cb  # Trigger pattern (type this to show clipboard)
+    optimize_enabled: true  # Enable AI optimization of clipboard content
+    max_length: 1000   # Max clipboard content length

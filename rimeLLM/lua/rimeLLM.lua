@@ -5,10 +5,12 @@ local ai_client = nil
 local input_capturer = nil
 local text_processor = nil
 local suggestion_display = nil
+local clipboard_module = nil
 local initialized = false
 local enabled = false
 local last_trigger_time = 0
 local DEBOUNCE_MS = 300
+local clipboard_processing = false
 
 function rimeLLM.init()
     if initialized then
@@ -49,6 +51,9 @@ function rimeLLM.init()
     
     suggestion_display = require("display").new(config_manager)
     suggestion_display:init()
+    
+    clipboard_module = require("clipboard").new(config_manager)
+    clipboard_module:init()
     
     initialized = true
     utils.info("rimeLLM initialized successfully")
@@ -109,6 +114,14 @@ function rimeLLM.on_composition_update(ctx)
         return
     end
     input_capturer:on_composition_update(ctx)
+    
+    if ctx and ctx.preedit and ctx.preedit.text then
+        local text = ctx.preedit.text
+        local should_trigger, reason = input_capturer:check_clipboard_trigger(text)
+        if should_trigger and reason == "trigger" then
+            rimeLLM:on_clipboard_trigger()
+        end
+    end
 end
 
 function rimeLLM.on_composition_end(ctx)
@@ -116,7 +129,49 @@ function rimeLLM.on_composition_end(ctx)
         return ""
     end
     local committed = input_capturer:on_composition_end(ctx)
+    input_capturer:deactivate_clipboard_trigger()
     return committed
+end
+
+function rimeLLM.on_clipboard_trigger()
+    local utils = require("utils")
+    utils.info("Clipboard trigger activated")
+    
+    if clipboard_processing then
+        utils.debug("Clipboard processing already in progress")
+        return
+    end
+    
+    local raw_text = clipboard_module:get_clipboard()
+    if not raw_text or raw_text == "" then
+        utils.debug("Clipboard is empty")
+        return
+    end
+    
+    clipboard_processing = true
+    
+    local optimize_enabled = config_manager:get("clipboard.optimize_enabled", true)
+    
+    if optimize_enabled then
+        local prompt = string.format([[Improve the following text for clarity and professionalism. Keep the meaning intact. Return ONLY the improved text.
+
+Text: %s
+Improved:]], raw_text)
+        
+        ai_client:chat(nil, prompt, function(response)
+            clipboard_processing = false
+            if response.success and response.response then
+                local optimized = utils.trim(response.response)
+                optimized = optimized:gsub("^Improved:%s*", "")
+                suggestion_display:show_clipboard_candidates(raw_text, optimized)
+            else
+                suggestion_display:show_clipboard_candidates(raw_text, nil)
+            end
+        end)
+    else
+        clipboard_processing = false
+        suggestion_display:show_clipboard_candidates(raw_text, nil)
+    end
 end
 
 function rimeLLM.on_text_committed(context)
@@ -197,7 +252,8 @@ function rimeLLM.on_candidate_select(index)
     if suggestion_display:is_visible_p() then
         local suggestion = suggestion_display:accept_suggestion(index)
         if suggestion then
-            rimeLLM:insert_text(suggestion.text)
+            rimeLLM.insert_text(suggestion.text)
+            input_capturer:deactivate_clipboard_trigger()
         end
     end
 end
